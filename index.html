@@ -26,12 +26,13 @@
             <div class="stuff-box cyan shadowed">
                 <h1> {{ forecastTitle }} </h1>
                 <p> 
-                <span class="redText"> 0 unlikely</span>
-                <span> 40 neutral</span>
-                <span class="greenText"> 0 likely</span>
+                <span class="redText"> {{ unlikely }} unlikely   </span>
+                <span> {{ neutral }} neutral   </span>
+                <span class="greenText"> {{ likely }} likely</span>
                 </p>
                 <div v-for="item in forecastList"
-                     :class=item.likelyhood
+                     :class="item.likelyhood"
+                     @click="onclick(item)"
                     >
                     <p> {{ item.header }} </p>
                     <ul>

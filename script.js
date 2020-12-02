@@ -1,7 +1,6 @@
 // API keys and globals
 const ipAPI = "access_key=efaec7b82fa80b2d0731ca9dc0f49803";
 const weatherAPI = "appid=09725fc33bf50124df14a16d159d49df";
-var theData;
 var lat;
 var lon;
 
@@ -14,8 +13,32 @@ const vm = Vue.createApp({
             conditionsList: [],
             forecastTitle: "Fetching forecast information...",
             forecastList: [],
+
+            likely: 0,
+            unlikely: 0,
+            neutral: 40,
         };
-    }
+    },
+
+    methods: {
+        onclick(item) {
+            if (item.likelyhood === 'neutral') {
+                item.likelyhood = 'likely';
+                this.neutral --;
+                this.likely ++;
+            } else if (item.likelyhood ==='likely') {
+                item.likelyhood = 'unlikely';
+                this.likely --;
+                this.unlikely ++;
+            } else {
+                item.likelyhood = 'neutral';
+                this.unlikely --;
+                this.neutral ++;
+            }
+            
+        }
+    },
+
 }).mount('#app');
 
 // api call to find the coordinates for the IP address
@@ -63,7 +86,6 @@ fetch(`http://api.ipstack.com/check?${ipAPI}`)
             vm.forecastTitle = `Error: ${json.error}`;
         } 
         else {
-            theData = json;
             vm.forecastTitle = '5 day 3-hour forecast'
             let list = json.list;
             
