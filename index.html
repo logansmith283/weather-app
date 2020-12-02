@@ -3,22 +3,47 @@
         <meta charset="utf-8">
         <title>Vue.js Weather App</title>
         <link href="./style.css" rel="stylesheet">
+        <script src="https://unpkg.com/vue@next"></script>
     </head>
     <body>
-        <div class="stuff-box gray shadowed">
-            <p>Vue.JS Weather App</p>
-        </div>
-        <div class="stuff-box blue shadowed">
-            <h1>Your Location</h1>
-            <p id="coords">Accessing coordinates for this IP Address</p>
-        </div>
-        <div id="current" class="stuff-box yellow shadowed">
-            <h1> Current Conditions </h1>
-            <p id="waitmessage1"> Fetching current weather conditions...</p>
-        </div>
-        <div id="forecast" class="stuff-box cyan shadowed">
-            <h1> 5 day 3-hour forecast </h1>
-            <p id="waitmessage2"> Fetching forecast information...</p>
+        <div id="app">
+            <div class="stuff-box gray shadowed">
+                <h1>{{ title }}</h1>
+            </div>
+            <div class="stuff-box blue shadowed">
+                <h1>Your Location</h1>
+                <p>{{ coordinates }}</p>
+            </div>
+            <div id="current" class="stuff-box yellow shadowed">
+                <h1> Current Conditions </h1>
+                <p>{{ current }}</p>
+                <ul>
+                    <li v-for="item in conditionsList">
+                        {{ item.message }}
+                    </li>
+                </ul>
+            </div>
+            <div class="stuff-box cyan shadowed">
+                <h1> {{ forecastTitle }} </h1>
+                <p> 
+                <span class="redText"> 0 unlikely</span>
+                <span> 40 neutral</span>
+                <span class="greenText"> 0 likely</span>
+                </p>
+                <div v-for="item in forecastList"
+                     :class=item.likelyhood
+                    >
+                    <p> {{ item.header }} </p>
+                    <ul>
+                        <li> Temperature {{ item.temp }} F </li>
+                        <li> High {{ item.high }} F </li>
+                        <li> Low {{ item.low }} F </li>
+                        <li> {{ item.sky }} </li>
+                        <li> {{ item.humidity }}% Humidity </li>
+                        <li> {{ item.pressure }} hPa Pressure </li>
+                    </ul>
+                </div>
+            </div>
         </div>
         <script src="./script.js"></script>
     </body>

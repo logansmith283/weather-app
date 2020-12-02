@@ -1,42 +1,86 @@
 // API keys and globals
 const ipAPI = "access_key=efaec7b82fa80b2d0731ca9dc0f49803";
 const weatherAPI = "appid=09725fc33bf50124df14a16d159d49df";
-//var lat;
-//var lon;
+var theData;
+var lat;
+var lon;
+
+const vm = Vue.createApp({
+    data() {
+        return {
+            title: "Vue.JS Weather App",
+            coordinates: "Accessing coordinates for this IP Address",
+            current: "Fetching current weather conditions...",
+            conditionsList: [],
+            forecastTitle: "Fetching forecast information...",
+            forecastList: [],
+        };
+    }
+}).mount('#app');
 
 // api call to find the coordinates for the IP address
 fetch(`http://api.ipstack.com/check?${ipAPI}`)
     .then(r => r.json())
     .then(json => {
-        let coordLabel = document.getElementById('coords');
         if (json.hasOwnProperty('error')){
             console.log(`Error: ${json.error}`);
-            label.textContent = `Error: ${json.error}`;
+            vm.coordinates = `Error: ${json.error}`;
         }
         else {
-            let lat = json.latitude;
-            let lon = json.longitude;
-            coordLabel.textContent = `You are located in ${json.city}, ${json.region_name}, ${json.country_name} at coordinates (${lat}, ${lon})`;
+            lat = json.latitude;
+            lon = json.longitude;
+            vm.coordinates = `You are located in ${json.city}, ${json.region_name}, ${json.country_name} at coordinates (${lat}, ${lon})`;
+
             // api call to openweathermap for current weather report
             return fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&${weatherAPI}&units=imperial`);
         }
     })
     .then(r => r.json())
     .then(json => {
-        let currentDiv = document.getElementById('current');
         if (json.hasOwnProperty('error')){
             console.log(`Error: ${json.error}`);
-            var para = document.createElement('p');
-            currentDiv.appendChild(para);
-            para.textContent = `Error: ${json.error}`;
+            vm.current = `Error: ${json.error}`;
         } 
         else {
-            document.getElementById('waitmessage1').remove();
             let date = new Date();
             date.setTime(json.dt*1000);
-            console.log(date);
-            var para = document.createElement('p');
-            para.textContent = `Current weather conditions @ ${date.toLocaleDateString()}, ${date.toLocaleTimeString()}`;
-            currentDiv.appendChild(para);
+            vm.current = `Current weather conditions @ ${date.toLocaleDateString()}, ${date.toLocaleTimeString()}`;
+            vm.conditionsList = [
+                {message:`Currently ${json.main.temp} F`},
+                {message:`High ${json.main.temp_max} F`},
+                {message:`Low ${json.main.temp_min} F`},
+                {message:`${json.weather[0].description}`},
+                {message:`${json.main.humidity}% humidity`},
+                {message:`${json.main.pressure} hPa pressure`}
+            ];
+            return fetch(`http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&${weatherAPI}&units=imperial`);
+        }
+    })
+    .then(r => r.json())
+    .then(json => {
+        if (json.hasOwnProperty('error')){
+            console.log(`Error: ${json.error}`);
+            vm.forecastTitle = `Error: ${json.error}`;
+        } 
+        else {
+            theData = json;
+            vm.forecastTitle = '5 day 3-hour forecast'
+            let list = json.list;
+            
+            for (var object of list) {
+                let date = new Date();
+                date.setTime(object.dt * 1000);
+                let listItem = {
+                    header:`Conditions for ${date.toLocaleString()}`,
+                    likelyhood: 'neutral',
+                    temp: object.main.temp,
+                    high: object.main.temp_max,
+                    low: object.main.temp_min,
+                    sky: object.weather[0].description,
+                    humidity: object.main.humidity,
+                    pressure: object.main.pressure
+                };
+                vm.forecastList.push(listItem);
+            }
         }
     });
