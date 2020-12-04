@@ -12,11 +12,19 @@
             </div>
             <div class="stuff-box blue shadowed">
                 <h1>Your Location</h1>
-                <p>{{ coordinates }}</p>
+                <p v-if="lat === ''">{{ loading }}</p>
+                <p v-else>
+                <span>You are located in <span>
+                <span v-if="city"> {{ city }}, </span>
+                <span v-if="region"> {{ region }}, </span>
+                <span v-if="country"> {{country}} </span>
+                <span> at coordinates ({{ lat }}, {{ lon }})</span>
+                </p>
             </div>
             <div id="current" class="stuff-box yellow shadowed">
                 <h1> Current Conditions </h1>
-                <p>{{ current }}</p>
+                <p v-if="current">{{ current }}</p>
+                <p v-else> {{ loading }} </p>
                 <ul>
                     <li v-for="item in conditionsList">
                         {{ item.message }}
@@ -24,7 +32,8 @@
                 </ul>
             </div>
             <div class="stuff-box cyan shadowed">
-                <h1> {{ forecastTitle }} </h1>
+                <h1 v-if="forecastTitle"> {{ forecastTitle }} </h1>
+                <h1 v-else> {{ loading }} </h1>
                 <p> 
                 <span class="redText"> {{ unlikely }} unlikely   </span>
                 <span> {{ neutral }} neutral   </span>

@@ -8,10 +8,16 @@ const vm = Vue.createApp({
     data() {
         return {
             title: "Vue.JS Weather App",
-            coordinates: "Accessing coordinates for this IP Address",
-            current: "Fetching current weather conditions...",
+            loading: "Fetching Data...",
+            coordinates: "",
+            city: "",
+            region: "",
+            country: "",
+            lat: "",
+            lon: "",
+            current: "",
             conditionsList: [],
-            forecastTitle: "Fetching forecast information...",
+            forecastTitle: "",
             forecastList: [],
 
             likely: 0,
@@ -50,12 +56,20 @@ fetch(`http://api.ipstack.com/check?${ipAPI}`)
             vm.coordinates = `Error: ${json.error}`;
         }
         else {
-            lat = json.latitude;
-            lon = json.longitude;
-            vm.coordinates = `You are located in ${json.city}, ${json.region_name}, ${json.country_name} at coordinates (${lat}, ${lon})`;
+            vm.lat = json.latitude;
+            vm.lon = json.longitude;
+            if (json.hasOwnProperty('city')) {
+                vm.city = json.city;
+            }
+            if (json.hasOwnProperty('region_name')) {
+                vm.region = json.region_name;
+            }
+            if (json.hasOwnProperty('country_name')){
+                vm.country = json.country_name;
+            }
 
             // api call to openweathermap for current weather report
-            return fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&${weatherAPI}&units=imperial`);
+            return fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${vm.lat}&lon=${vm.lon}&${weatherAPI}&units=imperial`);
         }
     })
     .then(r => r.json())
@@ -76,7 +90,7 @@ fetch(`http://api.ipstack.com/check?${ipAPI}`)
                 {message:`${json.main.humidity}% humidity`},
                 {message:`${json.main.pressure} hPa pressure`}
             ];
-            return fetch(`http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&${weatherAPI}&units=imperial`);
+            return fetch(`http://api.openweathermap.org/data/2.5/forecast?lat=${vm.lat}&lon=${vm.lon}&${weatherAPI}&units=imperial`);
         }
     })
     .then(r => r.json())
